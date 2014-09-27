@@ -1016,13 +1016,13 @@ let read_gnatls () =
 
 let setup_toolchain () =
   let mingw_libs pre =
-    gcc := pre ^ "-gcc";
-    objdump := pre ^ "-objdump";
+    gcc := "gcc";
+    objdump := "objdump";
     search_path :=
       !dirs @
       [
        Filename.dirname (get_output1 (!gcc ^ " -print-libgcc-file-name"));
-       get_output1 (!gcc ^ " -print-sysroot") ^ "/mingw/lib";
+       Filename.dirname (get_output1 (!gcc ^ " -print-file-name=libuser32.a"));
       ];
     default_libs :=
       ["-lmingw32"; "-lgcc"; "-lmoldname"; "-lmingwex"; "-lmsvcrt";
@@ -1080,9 +1080,9 @@ let compile_if_needed file =
     let cmd = match !toolchain with
       | `MSVC | `MSVC64 ->
 	  Printf.sprintf
-	    "cl /c /MD /nologo /Fo%s %s %s"
+	    "cl -c -MD -nologo -Fo%s %s %s"
 	    (Filename.quote tmp_obj)
-	    (mk_dirs_opt "/I")
+	    (mk_dirs_opt "-I")
 	    file
       | `CYGWIN | `CYGWIN64 ->
 	  Printf.sprintf
@@ -1092,8 +1092,7 @@ let compile_if_needed file =
 	    file
       | `MINGW | `MINGW64 | `GNAT ->
 	  Printf.sprintf
-	    "%s -c -o %s %s %s"
-            !gcc
+	    "gcc -c -o %s %s %s"
 	    (Filename.quote tmp_obj)
 	    (mk_dirs_opt "-I")
             (Filename.quote file)
