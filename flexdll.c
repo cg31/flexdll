@@ -124,7 +124,7 @@ static void dump_reloctbl(reloctbl *tbl) {
     printf(" %p (kind:%04lx) (now:%p)  %s\n",
 	   ptr->addr,
 	   ptr->kind,
-	   *((uintnat*) ptr->addr),
+	   (UINT_PTR) *((uintnat*) ptr->addr),
 	   ptr->name
 	   );
 }
@@ -205,7 +205,7 @@ static void relocate(resolver f, void *data, reloctbl *tbl) {
       s -= (INT_PTR)(ptr -> addr) + 4;
       s += *((INT32*) ptr -> addr);
       if (s != (INT32) s) {
-        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32, target is too far: %p  %p", s, (INT32) s);
+        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32, target is too far: %p  %p", s, (UINT_PTR) s);
         error = 3;
         return;
       }
@@ -215,7 +215,7 @@ static void relocate(resolver f, void *data, reloctbl *tbl) {
       s -= (INT_PTR)(ptr -> addr) + 8;
       s += *((INT32*) ptr -> addr);
       if (s != (INT32) s) {
-        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32_4, target is too far: %p  %p", s, (INT32) s);
+        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32_4, target is too far: %p  %p", s, (UINT_PTR) s);
         error = 3;
         return;
       }
@@ -225,7 +225,7 @@ static void relocate(resolver f, void *data, reloctbl *tbl) {
       s -= (INT_PTR)(ptr -> addr) + 5;
       s += *((INT32*) ptr -> addr);
       if (s != (INT32) s) {
-        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32_1, target is too far: %p  %p", s, (INT32) s);
+        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32_1, target is too far: %p  %p", s, (UINT_PTR) s);
         error = 3;
         return;
       }
@@ -235,7 +235,7 @@ static void relocate(resolver f, void *data, reloctbl *tbl) {
       s -= (INT_PTR)(ptr -> addr) + 6;
       s += *((INT32*) ptr -> addr);
       if (s != (INT32) s) {
-        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32_2, target is too far: %p  %p", s, (INT32) s);
+        sprintf(error_buffer, "flexdll error: cannot relocate RELOC_REL32_2, target is too far: %p  %p", s, (UINT_PTR) s);
         error = 3;
         return;
       }
