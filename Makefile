@@ -1,9 +1,7 @@
-VERSION = 0.32
+VERSION = 0.34
 all: flexlink.exe support
 
-OCAML_ROOT=$(shell cygpath -a "$(shell ocamlopt -where)")
-
-include $(OCAML_ROOT)/lib/Makefile.config
+include $(shell cygpath -ad "$(shell ocamlopt -where)/Makefile.config")
 
 MINGW_PREFIX = i686-w64-mingw32
 MINCC = $(MINGW_PREFIX)-gcc
@@ -33,9 +31,9 @@ CHAINS = mingw mingw64 cygwin cygwin64 msvc msvc64
 
 MSVCC_ROOT = $(shell which cl.exe | cygpath -f - -ad | xargs -d \\n dirname | cygpath -f - -m)
 MSVC_LIB1 = $(shell dirname $(MSVCC_ROOT))
-MSVC_LIB2 = $(shell which rc.exe | cygpath -f - -ad | xargs -d \\n dirname | xargs -d \\n dirname | cygpath -f - -m)
+MSVC_LIB2 = $(shell which ResGen.exe | cygpath -f - -ad | xargs -d \\n dirname | xargs -d \\n dirname | cygpath -f - -m)
 MSVC_LIB = $(MSVC_LIB1)/Lib;$(MSVC_LIB2)/Lib
-MSVC_INCLUDE = $(MSVC_LIB1)/Include;$(MSVC_LIB2)/../Include/um;$(MSVC_LIB2)/../Include/shared
+MSVC_INCLUDE = $(MSVC_LIB1)/Include;$(MSVC_LIB2)/Include
 MSVC_PREFIX=LIB="$(MSVC_LIB)" INCLUDE="$(MSVC_INCLUDE)" 
 
 MSVC64_LIB = $(MSVC_LIB1)/Lib/amd64;$(MSVC_LIB2)/Lib/x64
@@ -45,8 +43,8 @@ show_root:
 	@echo "$(MSVCC_ROOT)"
 	@echo "$(MSVC_LIB)"
 
-MSVCC = $(MSVCC_ROOT)/cl.exe -nologo -MD -D_CRT_SECURE_NO_DEPRECATE -GS-
-MSVCC64 = $(MSVCC_ROOT)/amd64/cl.exe -nologo -MD -D_CRT_SECURE_NO_DEPRECATE -GS-
+MSVCC = $(MSVCC_ROOT)/cl.exe /nologo /MD -D_CRT_SECURE_NO_DEPRECATE /GS-
+MSVCC64 = $(MSVCC_ROOT)/amd64/cl.exe /nologo /MD -D_CRT_SECURE_NO_DEPRECATE /GS-
 OCAMLOPT = ocamlopt
 #OCAMLOPT = FLEXLINKFLAGS=-real-manifest ocamlopt
 #LINKFLAGS = unix.cmxa
@@ -80,7 +78,7 @@ OBJS = version.ml coff.ml cmdline.ml create_dll.ml reloc.ml
 flexlink.exe: $(OBJS) $(RES)
 	@echo Building flexlink.exe with TOOLCHAIN=$(TOOLCHAIN)
 	rm -f flexlink.exe
-	$(OCAMLOPT) -I $(OCAML_ROOT)/lib -g -w -105 -o flexlink.exe $(LINKFLAGS) $(OBJS)
+	$(OCAMLOPT) -g -w -105 -o flexlink.exe $(LINKFLAGS) $(OBJS)
 
 version.res: version.rc
 	rc version.rc
@@ -89,10 +87,10 @@ version_res.o: version.rc
 	windres version.rc version_res.o
 
 flexdll_msvc.obj: flexdll.h flexdll.c
-	$(MSVC_PREFIX) $(MSVCC) -DMSVC -c -Fo"flexdll_msvc.obj" flexdll.c
+	$(MSVC_PREFIX) $(MSVCC) /DMSVC -c /Fo"flexdll_msvc.obj" flexdll.c
 
 flexdll_msvc64.obj: flexdll.h flexdll.c
-	$(MSVC64_PREFIX) $(MSVCC64) -DMSVC  -c -Fo"flexdll_msvc64.obj" flexdll.c
+	$(MSVC64_PREFIX) $(MSVCC64) /DMSVC  -c /Fo"flexdll_msvc64.obj" flexdll.c
 
 flexdll_cygwin.o: flexdll.h flexdll.c
 	$(CYGCC) -c -DCYGWIN -o flexdll_cygwin.o flexdll.c
@@ -110,10 +108,10 @@ flexdll_mingw64.o: flexdll.h flexdll.c
 	$(MIN64CC) -c -DMINGW -o flexdll_mingw64.o flexdll.c
 
 flexdll_initer_msvc.obj: flexdll_initer.c
-	$(MSVC_PREFIX) $(MSVCC) -c -Fo"flexdll_initer_msvc.obj" flexdll_initer.c
+	$(MSVC_PREFIX) $(MSVCC) -c /Fo"flexdll_initer_msvc.obj" flexdll_initer.c
 
 flexdll_initer_msvc64.obj: flexdll_initer.c
-	$(MSVC64_PREFIX) $(MSVCC64) -c -Fo"flexdll_initer_msvc64.obj" flexdll_initer.c
+	$(MSVC64_PREFIX) $(MSVCC64) -c /Fo"flexdll_initer_msvc64.obj" flexdll_initer.c
 
 flexdll_initer_cygwin.o: flexdll_initer.c
 	$(CYGCC) -c -o flexdll_initer_cygwin.o flexdll_initer.c

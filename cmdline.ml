@@ -42,6 +42,8 @@ let cygpath_arg : [`Yes | `No | `None] ref = ref `None
 let implib = ref false
 let deffile = ref None
 let stack_reserve = ref None
+let no_rel_relocs = ref false
+let base_addr = ref "0x10000"
 
 let usage_msg =
   Printf.sprintf
@@ -78,6 +80,12 @@ let specs = [
 
   "-noexport", Arg.Set noexport,
   " Do not export any symbol";
+
+  "-norelrelocs", Arg.Set no_rel_relocs,
+  " Ensure that no relative relocation is generated";
+
+  "-base", Arg.String (fun s -> base_addr := s),
+  " Specify base address (Win64 only)";
 
   "-I", Arg.String (fun dir -> dirs := dir :: !dirs),
   "<dir> Add a directory where to search for files";
